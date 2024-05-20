@@ -6,7 +6,7 @@ number_of_iteration_list = [];
 
 time_elapsed_list = [];
 
-number_of_execution = 50;
+number_of_execution = 3;
 
 i = 0;
 
@@ -52,7 +52,11 @@ while(i < number_of_execution)
         
         g = gradfunc(x);
         
-        alpha = 0.07;
+        % % Initial alpha value
+        % alpha = 0.07;
+
+        % Find optimal alpha value
+        alpha = backtracking_line_search(x, -g);
         
         x_next = x - alpha * g;
         g_next = gradfunc(x_next);
@@ -66,20 +70,25 @@ while(i < number_of_execution)
         while(norm(gradfunc(x_next))>epsilon)
             x = x_next;
             g = g_next;
+
+            % Method 1 for alpha value opt
+            % Find optimal alpha value
+            alpha = backtracking_line_search(x, -g);
+
+            % % Method 2 for alpha value opt
+            % % Decrease learning rate every 5 steps for sensitivity
+            % if(mod(k, 5) == 0)
+            %     alpha = alpha * 0.9;
+            % end
         
             x_next = x - alpha * g;
             g_next = gradfunc(x_next);
         
-            fprintf('k=%d, x1=%f, x2=%f, f(x)=%f, abs. error=%f\n',k,x_next(1), ...
+            fprintf('k=%d, x1=%f, x2=%f, f(x)=%f, error=%f\n',k,x_next(1), ...
                 x_next(2),func(x_next),norm(gradfunc(x_next)))
         
             plot(x_next(1),x_next(2),'*', 'Color', colors{j})
             k=k+1;
-    
-            % Decrease learning rate every 5 steps for sensitivity
-            if(mod(k, 5) == 0)
-                alpha = alpha * 0.9;
-            end
     
             if(k > max_iteration)
                 break;
@@ -105,3 +114,15 @@ end
 success_rate = success / (number_of_execution * 3)
 avarage_of_number_of_iteration = mean(number_of_iteration_list)
 avarage_of_time_elapsed = mean(time_elapsed_list)
+
+% Backtracking line search
+function alpha = backtracking_line_search(x, d)
+    % Parameters
+    alpha = 1;
+    rho = 0.5;
+    c = 1e-4;
+    
+    while func(x + alpha * d) > func(x) + c * alpha * gradfunc(x)' * d
+        alpha = rho * alpha;
+    end
+end
