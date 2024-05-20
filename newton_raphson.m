@@ -33,9 +33,9 @@ while(i < number_of_execution)
     
     % Initial guesses
     % [0, 1] -> [-2, 2]
-    x01 = -2 + 4 * rand(2, 1);
-    x02 = -2 + 4 * rand(2, 1);
-    x03 = -2 + 4 * rand(2, 1);
+    x01 = -50 + 100 * rand(2, 1);
+    x02 = -50 + 100 * rand(2, 1);
+    x03 = -50 + 100 * rand(2, 1);
     
     x0 = [x01, x02, x03];
     colors = {'r', 'g', 'k'};
