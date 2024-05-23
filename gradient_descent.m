@@ -6,7 +6,7 @@ number_of_iteration_list = [];
 
 time_elapsed_list = [];
 
-number_of_execution = 3;
+number_of_execution = 1;
 
 i = 0;
 
@@ -45,49 +45,55 @@ while(i < number_of_execution)
     for j = 1:3
         x = x0(:, j);
         k = 1;
-    
+        
+        path = x; % Store the path for visualization
+
         tic
         fprintf('k=1, x1=%f, x2=%f, f(x)=%f\n',x(1),x(2),func(x))
         plot(x(1), x(2), '.', 'Color', colors{j})
         
         g = gradfunc(x);
         
-        % % Initial alpha value
-        % alpha = 0.07;
+        % Initial alpha value
+        alpha = 0.07;
 
-        % Find optimal alpha value
-        alpha = backtracking_line_search(x, -g);
+        % % Find optimal alpha value
+        % alpha = backtracking_line_search(x, -g);
         
         x_next = x - alpha * g;
         g_next = gradfunc(x_next);
+
+        path = [path, x_next];
         
         fprintf('k=2, x1=%f, x2=%f, f(x)=%f, error=%f\n',x_next(1),x_next(2), ...
             func(x_next),norm(gradfunc(x_next)))
         
-        plot(x_next(1),x_next(2),'*', 'Color', colors{j})
+        % plot(x_next(1),x_next(2),'*', 'Color', colors{j})
         k=3;
         
         while(norm(gradfunc(x_next))>epsilon)
             x = x_next;
             g = g_next;
 
-            % Method 1 for alpha value opt
-            % Find optimal alpha value
-            alpha = backtracking_line_search(x, -g);
+            % % Method 1 for alpha value opt
+            % % Find optimal alpha value
+            % alpha = backtracking_line_search(x, -g);
 
-            % % Method 2 for alpha value opt
-            % % Decrease learning rate every 5 steps for sensitivity
-            % if(mod(k, 5) == 0)
-            %     alpha = alpha * 0.9;
-            % end
+            % Method 2 for alpha value opt
+            % Decrease learning rate every 5 steps for sensitivity
+            if(mod(k, 5) == 0)
+                alpha = alpha * 0.9;
+            end
         
             x_next = x - alpha * g;
             g_next = gradfunc(x_next);
+
+            path = [path, x_next];
         
             fprintf('k=%d, x1=%f, x2=%f, f(x)=%f, error=%f\n',k,x_next(1), ...
                 x_next(2),func(x_next),norm(gradfunc(x_next)))
         
-            plot(x_next(1),x_next(2),'*', 'Color', colors{j})
+            % plot(x_next(1),x_next(2),'*', 'Color', colors{j})
             k=k+1;
     
             if(k > max_iteration)
@@ -95,6 +101,9 @@ while(i < number_of_execution)
             end
         end
         time_elapsed = toc;
+        
+        plot(path(1, :), path(2, :), 'o-', 'Color', colors{j}, 'MarkerFaceColor', colors{j}, 'LineWidth', 1, 'MarkerSize', 2.5);
+        plot(path(1, end), path(2, end), 'x', 'Color', colors{j}, 'MarkerSize', 5, 'LineWidth', 2); % final point
 
         if(k <= max_iteration)
             success = success + 1;
@@ -104,8 +113,8 @@ while(i < number_of_execution)
         number_of_iteration_list = [number_of_iteration_list, k];
     end
     
-    title('Gradient Descent Algorithm')
-    set(gca,'fontsize',35)
+    % title('Gradient Descent Algorithm')
+    set(gca,'fontsize',24)
     set(findobj(gca, 'Type', 'Line', 'Linestyle', '--'), 'LineWidth', 2);
     
     i = i+1;

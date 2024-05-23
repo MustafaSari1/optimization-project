@@ -6,7 +6,7 @@ number_of_iteration_list = [];
 
 time_elapsed_list = [];
 
-number_of_execution = 5;
+number_of_execution = 1;
 
 i = 0;
 
@@ -45,6 +45,8 @@ while(i < number_of_execution)
     for j = 1:3
         x = x0(:, j);
         k = 1;
+
+        path = x; % Store the path for visualization
     
         tic
         
@@ -70,11 +72,13 @@ while(i < number_of_execution)
         beta = (g_next' * (g_next - g)) / (g' * g); 
         
         d_next = -g_next + beta * d;
+
+        path = [path, x_next];
         
         fprintf('k=2, x1=%f, x2=%f, f(x)=%f, error=%f\n',x_next(1),x_next(2), ...
             func(x_next),norm(gradfunc(x_next)))
         
-        plot(x_next(1),x_next(2),'*', 'Color', colors{j})
+        % plot(x_next(1),x_next(2),'*', 'Color', colors{j})
         k=3;
         
         while(norm(gradfunc(x_next))>epsilon)
@@ -96,11 +100,13 @@ while(i < number_of_execution)
             g_next = gradfunc(x_next);
             beta = (g_next' * (g_next - g)) / (g' * g);
             d_next = -g_next + beta * d;
+
+            path = [path, x_next];
         
             fprintf('k=%d, x1=%f, x2=%f, f(x)=%f, abs. error=%f\n',k,x_next(1), ...
                 x_next(2),func(x_next),norm(gradfunc(x_next)))
         
-            plot(x_next(1),x_next(2),'*', 'Color', colors{j})
+            % plot(x_next(1),x_next(2),'*', 'Color', colors{j})
             k=k+1;
     
             if(k > max_iteration)
@@ -108,6 +114,9 @@ while(i < number_of_execution)
             end
         end
         time_elapsed = toc;
+
+        plot(path(1, :), path(2, :), 'o-', 'Color', colors{j}, 'MarkerFaceColor', colors{j}, 'LineWidth', 1, 'MarkerSize', 2.5);
+        plot(path(1, end), path(2, end), 'x', 'Color', colors{j}, 'MarkerSize', 7, 'LineWidth', 2); % final point
 
         if(k <= max_iteration)
             success = success + 1;
@@ -117,8 +126,8 @@ while(i < number_of_execution)
         number_of_iteration_list = [number_of_iteration_list, k];
     end
     
-    title('Polak-Ribiere Algorithm')
-    set(gca,'fontsize',35)
+    % title('Polak-Ribiere Algorithm')
+    set(gca,'fontsize',24)
     set(findobj(gca, 'Type', 'Line', 'Linestyle', '--'), 'LineWidth', 2);
 
     i = i + 1;
